@@ -11,7 +11,12 @@ export async function POST(req: NextRequest) {
     const { data: user } = await supabase.from('users').select('*').eq('id', userId).single();
     if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
-    const relContext = { peer: 'kollega', prospect: 'potentiel kunde', client: 'kunde', leader: 'leder' }[relationship] || 'kontakt';
+    let relContext = 'kontakt';
+    if (relationship === 'peer') relContext = 'kollega';
+    if (relationship === 'prospect') relContext = 'potentiel kunde';
+    if (relationship === 'client') relContext = 'kunde';
+    if (relationship === 'leader') relContext = 'leder';
+
     const prompt = `Du er LinkedIn kommentar-ekspert. Skriv 3 kommentarer på ${language} i ${tone} tone. Relation: ${relContext}.
 
 POST:
@@ -38,10 +43,13 @@ OUTPUT (KUN JSON):
     try {
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       result = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(responseText);
-    } catch { return NextResponse.json({ error: 'Parse error' }, { status: 500 }); }
+    } catch { 
+      return NextResponse.json({ error: 'Parse error' }, { status: 500 }); 
+    }
 
     return NextResponse.json(result);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
