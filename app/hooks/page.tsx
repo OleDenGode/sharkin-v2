@@ -32,6 +32,7 @@ interface HookResult {
 
 export default function HooksPage() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
   const [bulletPoints, setBulletPoints] = useState('');
   const [language, setLanguage] = useState('da');
   const [tone, setTone] = useState('professional');
@@ -43,15 +44,44 @@ export default function HooksPage() {
   const [expandedHook, setExpandedHook] = useState<string | null>(null);
   const router = useRouter();
 
+  // Load saved state from localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem('hooks_state');
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      setBulletPoints(parsed.bulletPoints || '');
+      setLanguage(parsed.language || 'da');
+      setTone(parsed.tone || 'professional');
+      setTargetAudience(parsed.targetAudience || '');
+      setPurpose(parsed.purpose || '');
+      if (parsed.result) setResult(parsed.result);
+    }
+  }, []);
+
+  // Save state to localStorage on change
+  useEffect(() => {
+    const state = { bulletPoints, language, tone, targetAudience, purpose, result };
+    localStorage.setItem('hooks_state', JSON.stringify(state));
+  }, [bulletPoints, language, tone, targetAudience, purpose, result]);
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
         router.push('/login');
       } else {
         setUserId(user.id);
+        setUserEmail(user.email || '');
       }
     });
   }, [router]);
+
+  const handleLogout = async () => {
+    localStorage.removeItem('hooks_state');
+    localStorage.removeItem('ghostwriter_state');
+    localStorage.removeItem('comments_state');
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   const generateHooks = async () => {
     if (!bulletPoints.trim()) {
@@ -78,7 +108,6 @@ export default function HooksPage() {
       });
 
       setStatus('🪝 Genererer hooks og outlines...');
-
       const data = await response.json();
 
       if (response.ok) {
@@ -103,12 +132,9 @@ export default function HooksPage() {
 
   const sendToGhostwriter = (hook: Hook) => {
     const outlineText = hook.outline.join('\n');
-    const fullContext = `HOOK:\n${hook.text}\n\nOUTLINE:\n${outlineText}\n\nPOST TYPE: ${hook.postType}`;
-    
     localStorage.setItem('ghostwriter_hook', hook.text);
     localStorage.setItem('ghostwriter_outline', outlineText);
     localStorage.setItem('ghostwriter_postType', hook.postType);
-    
     router.push('/ghostwriter?fromHook=true');
   };
 
@@ -116,17 +142,48 @@ export default function HooksPage() {
     setExpandedHook(expandedHook === hookId ? null : hookId);
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="mb-6 text-blue-600 hover:underline"
-        >
-          ← Tilbage til Dashboard
-        </button>
+  const clearForm = () => {
+    setBulletPoints('');
+    setTargetAudience('');
+    setPurpose('');
+    setResult(null);
+    localStorage.removeItem('hooks_state');
+  };
 
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">🪝 Hook & Intro Studio</h1>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* TOP MENU */}
+      <nav className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+          <div 
+            className="flex items-center gap-2 cursor-pointer" 
+            onClick={() => router.push('/dashboard')}
+          >
+            <span className="text-3xl">🦈</span>
+            <h1 className="text-xl md:text-2xl font-bold text-blue-600">SharkIN</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-600 text-sm hidden md:block">{userEmail}</span>
+            <button
+              onClick={handleLogout}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              Log ud
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto p-4 md:p-6">
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold">🪝 Hook & Intro Studio</h1>
+          <button
+            onClick={clearForm}
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            Ryd alt
+          </button>
+        </div>
         <p className="text-gray-600 mb-8">Få 5 hooks med outlines klar til Ghostwriter</p>
 
         <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
@@ -204,9 +261,7 @@ export default function HooksPage() {
         {status && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 font-medium">{status}</p>
-            <p className="text-blue-600 text-sm mt-1">
-              Dette kan tage 20-40 sekunder...
-            </p>
+            <p className="text-blue-600 text-sm mt-1">Dette kan tage 20-40 sekunder...</p>
           </div>
         )}
 
@@ -218,19 +273,19 @@ export default function HooksPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Post-type:</p>
-                  <p className="font-medium">{result.analysis.postType}</p>
+                  <p className="font-medium">{result.analysis?.postType}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Tone:</p>
-                  <p className="font-medium">{result.analysis.toneGuidance}</p>
+                  <p className="font-medium">{result.analysis?.toneGuidance}</p>
                 </div>
                 <div className="md:col-span-2">
                   <p className="text-sm text-gray-600">Kerneindsigt:</p>
-                  <p className="font-medium">{result.analysis.coreInsight}</p>
+                  <p className="font-medium">{result.analysis?.coreInsight}</p>
                 </div>
                 <div className="md:col-span-2">
                   <p className="text-sm text-gray-600">Ønsket outcome:</p>
-                  <p className="font-medium">{result.analysis.intendedOutcome}</p>
+                  <p className="font-medium">{result.analysis?.intendedOutcome}</p>
                 </div>
               </div>
             </div>
@@ -239,9 +294,8 @@ export default function HooksPage() {
             <div className="space-y-4">
               <h2 className="text-xl md:text-2xl font-bold">🪝 Dine 5 hooks:</h2>
               
-              {result.hooks.map((hook, index) => (
+              {result.hooks?.map((hook, index) => (
                 <div key={hook.id || index} className="bg-white rounded-lg shadow overflow-hidden">
-                  {/* Hook Header */}
                   <div className="p-4 md:p-6">
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
@@ -285,19 +339,18 @@ export default function HooksPage() {
                     </div>
                   </div>
 
-                  {/* Expanded Outline */}
                   {expandedHook === hook.id && (
                     <div className="bg-gray-50 border-t border-gray-200 p-4 md:p-6">
                       <h4 className="font-medium mb-3">📝 Post-outline:</h4>
                       <ol className="space-y-2">
-                        {hook.outline.map((step, i) => (
+                        {hook.outline?.map((step, i) => (
                           <li key={i} className="text-sm text-gray-700 pl-2 border-l-2 border-blue-300">
                             {step}
                           </li>
                         ))}
                       </ol>
                       <button
-                        onClick={() => copyToClipboard(hook.outline.join('\n'))}
+                        onClick={() => copyToClipboard(hook.outline?.join('\n') || '')}
                         className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm"
                       >
                         📋 Kopier outline
