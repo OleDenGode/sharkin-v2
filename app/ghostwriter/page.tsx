@@ -10,6 +10,7 @@ const supabase = createClient(
 
 export default function GhostwriterPage() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
   const [hook, setHook] = useState('');
   const [outline, setOutline] = useState('');
   const [postType, setPostType] = useState('');
@@ -25,12 +26,33 @@ export default function GhostwriterPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Load saved state from localStorage
+  useEffect(() => {
+    const savedState = localStorage.getItem('ghostwriter_state');
+    if (savedState) {
+      const parsed = JSON.parse(savedState);
+      setIdea(parsed.idea || '');
+      setLanguage(parsed.language || 'da');
+      setTone(parsed.tone || 'professional');
+      setTargetAudience(parsed.targetAudience || '');
+      setPreviousPosts(parsed.previousPosts || '');
+      if (parsed.posts) setPosts(parsed.posts);
+    }
+  }, []);
+
+  // Save state to localStorage on change
+  useEffect(() => {
+    const state = { idea, language, tone, targetAudience, previousPosts, posts };
+    localStorage.setItem('ghostwriter_state', JSON.stringify(state));
+  }, [idea, language, tone, targetAudience, previousPosts, posts]);
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) {
         router.push('/login');
       } else {
         setUserId(user.id);
+        setUserEmail(user.email || '');
       }
     });
 
@@ -47,12 +69,19 @@ export default function GhostwriterPage() {
       if (savedOutline) setOutline(savedOutline);
       if (savedPostType) setPostType(savedPostType);
       
-      // Clear localStorage after loading
       localStorage.removeItem('ghostwriter_hook');
       localStorage.removeItem('ghostwriter_outline');
       localStorage.removeItem('ghostwriter_postType');
     }
   }, [router, searchParams]);
+
+  const handleLogout = async () => {
+    localStorage.removeItem('hooks_state');
+    localStorage.removeItem('ghostwriter_state');
+    localStorage.removeItem('comments_state');
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   const generatePosts = async () => {
     if (!hook.trim() && !idea.trim()) {
@@ -110,17 +139,52 @@ export default function GhostwriterPage() {
     setFromHook(false);
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => router.push('/dashboard')}
-          className="mb-6 text-blue-600 hover:underline"
-        >
-          ← Tilbage til Dashboard
-        </button>
+  const clearForm = () => {
+    setHook('');
+    setOutline('');
+    setPostType('');
+    setIdea('');
+    setTargetAudience('');
+    setPreviousPosts('');
+    setPosts([]);
+    setFromHook(false);
+    localStorage.removeItem('ghostwriter_state');
+  };
 
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">✍️ Ghostwriter Workspace</h1>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* TOP MENU */}
+      <nav className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+          <div 
+            className="flex items-center gap-2 cursor-pointer" 
+            onClick={() => router.push('/dashboard')}
+          >
+            <span className="text-3xl">🦈</span>
+            <h1 className="text-xl md:text-2xl font-bold text-blue-600">SharkIN</h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-600 text-sm hidden md:block">{userEmail}</span>
+            <button
+              onClick={handleLogout}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              Log ud
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto p-4 md:p-6">
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold">✍️ Ghostwriter Workspace</h1>
+          <button
+            onClick={clearForm}
+            className="text-sm text-gray-500 hover:text-gray-700"
+          >
+            Ryd alt
+          </button>
+        </div>
         <p className="text-gray-600 mb-8">Skriv komplette LinkedIn posts baseret på din hook eller idé</p>
 
         {/* Hook from Hook Generator */}
@@ -153,7 +217,6 @@ export default function GhostwriterPage() {
         )}
 
         <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
-          {/* Hook input (if not from Hook Generator) */}
           {!fromHook && (
             <>
               <label className="block text-sm font-medium mb-2">
@@ -184,14 +247,14 @@ export default function GhostwriterPage() {
           />
 
           <label className="block text-sm font-medium mb-2 mt-4">
-            Dine tidligere posts (valgfrit - hjælper AI'en med at matche din stil):
+            Dine tidligere posts (valgfrit - hjælper AI med at matche din stil):
           </label>
           <textarea
             value={previousPosts}
             onChange={(e) => setPreviousPosts(e.target.value)}
             rows={3}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Paste 2-3 af dine tidligere LinkedIn posts her, så AI'en kan lære din stil..."
+            placeholder="Paste 2-3 af dine tidligere LinkedIn posts her..."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -246,9 +309,7 @@ export default function GhostwriterPage() {
         {status && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 font-medium">{status}</p>
-            <p className="text-blue-600 text-sm mt-1">
-              Dette kan tage 20-40 sekunder...
-            </p>
+            <p className="text-blue-600 text-sm mt-1">Dette kan tage 20-40 sekunder...</p>
           </div>
         )}
 
@@ -268,20 +329,17 @@ export default function GhostwriterPage() {
                 <p className="text-base md:text-lg whitespace-pre-line mb-4">
                   {post.content}
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => copyToClipboard(post.content)}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm"
-                  >
-                    📋 Kopier post
-                  </button>
-                </div>
+                <button
+                  onClick={() => copyToClipboard(post.content)}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm"
+                >
+                  📋 Kopier post
+                </button>
               </div>
             ))}
           </div>
         )}
 
-        {/* Quick link to Hook Generator */}
         {!fromHook && posts.length === 0 && (
           <div className="text-center mt-8 p-6 bg-gray-100 rounded-lg">
             <p className="text-gray-600 mb-3">Mangler du inspiration til en hook?</p>
