@@ -58,7 +58,10 @@ function GhostwriterContent() {
       const savedHook = localStorage.getItem('ghostwriter_hook');
       const savedOutline = localStorage.getItem('ghostwriter_outline');
       const savedPostType = localStorage.getItem('ghostwriter_postType');
-      if (savedHook) { setHook(savedHook); setFromHook(true); }
+      if (savedHook) {
+        setHook(savedHook);
+        setFromHook(true);
+      }
       if (savedOutline) setOutline(savedOutline);
       if (savedPostType) setPostType(savedPostType);
       localStorage.removeItem('ghostwriter_hook');
@@ -76,7 +79,10 @@ function GhostwriterContent() {
   };
 
   const generatePosts = async () => {
-    if (!hook.trim() && !idea.trim()) { alert('Skriv venligst en hook eller idé først!'); return; }
+    if (!hook.trim() && !idea.trim()) {
+      alert('Skriv venligst en hook eller idé først!');
+      return;
+    }
     setLoading(true);
     setStatus('✍️ Skriver dine posts...');
     setPosts([]);
@@ -87,15 +93,44 @@ function GhostwriterContent() {
         body: JSON.stringify({ userId, language, tone, targetAudience, hook, outline, postType, idea, previousPosts }),
       });
       const data = await response.json();
-      if (response.ok) { setStatus(''); setPosts(data.posts); }
-      else { setStatus(''); alert(data.error || 'Noget gik galt'); }
-    } catch (error) { setStatus(''); alert('Fejl ved generering'); }
-    finally { setLoading(false); }
+      if (response.ok) {
+        setStatus('');
+        setPosts(data.posts);
+      } else {
+        setStatus('');
+        alert(data.error || 'Noget gik galt');
+      }
+    } catch (error) {
+      setStatus('');
+      alert('Fejl ved generering');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const copyToClipboard = (text: string) => { navigator.clipboard.writeText(text); alert('Kopieret!'); };
-  const clearHookData = () => { setHook(''); setOutline(''); setPostType(''); setFromHook(false); };
-  const clearForm = () => { setHook(''); setOutline(''); setPostType(''); setIdea(''); setTargetAudience(''); setPreviousPosts(''); setPosts([]); setFromHook(false); localStorage.removeItem('ghostwriter_state'); };
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert('Kopieret!');
+  };
+
+  const clearHookData = () => {
+    setHook('');
+    setOutline('');
+    setPostType('');
+    setFromHook(false);
+  };
+
+  const clearForm = () => {
+    setHook('');
+    setOutline('');
+    setPostType('');
+    setIdea('');
+    setTargetAudience('');
+    setPreviousPosts('');
+    setPosts([]);
+    setFromHook(false);
+    localStorage.removeItem('ghostwriter_state');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -126,7 +161,9 @@ function GhostwriterContent() {
               <button onClick={clearHookData} className="text-sm text-green-600 hover:text-green-800">✕ Ryd</button>
             </div>
             <p className="text-lg font-medium whitespace-pre-line mb-3">{hook}</p>
-            {postType && <span className="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded mb-3">{postType}</span>}
+            {postType && (
+              <span className="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded mb-3">{postType}</span>
+            )}
             {outline && (
               <div className="mt-3 pt-3 border-t border-green-200">
                 <p className="text-sm font-medium text-green-800 mb-2">📝 Outline:</p>
@@ -138,15 +175,37 @@ function GhostwriterContent() {
 
         <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
           {!fromHook && (
-            <>
+            <div className="mb-4">
               <label className="block text-sm font-medium mb-2">Hook (valgfrit):</label>
-              <textarea value={hook} onChange={(e) => setHook(e.target.value)} rows={2} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4" placeholder="Eks: De bedste ledere stiller flere spørgsmål end de giver svar." />
-            </>
+              <textarea
+                value={hook}
+                onChange={(e) => setHook(e.target.value)}
+                rows={2}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Eks: De bedste ledere stiller flere spørgsmål end de giver svar."
+              />
+            </div>
           )}
-          <label className="block text-sm font-medium mb-2">{fromHook ? 'Ekstra kontekst (valgfrit):' : 'Din idé eller kernbudskab:'}</label>
-          <textarea value={idea} onChange={(e) => setIdea(e.target.value)} rows={4} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder={fromHook ? "Tilføj ekstra kontekst..." : "Eks: Jeg har bemærket at de bedste ledere..."} />
+
+          <label className="block text-sm font-medium mb-2">
+            {fromHook ? 'Ekstra kontekst (valgfrit):' : 'Din idé eller kernbudskab:'}
+          </label>
+          <textarea
+            value={idea}
+            onChange={(e) => setIdea(e.target.value)}
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder={fromHook ? 'Tilføj ekstra kontekst...' : 'Eks: Jeg har bemærket at de bedste ledere...'}
+          />
+
           <label className="block text-sm font-medium mb-2 mt-4">Dine tidligere posts (valgfrit):</label>
-          <textarea value={previousPosts} onChange={(e) => setPreviousPosts(e.target.value)} rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Paste 2-3 af dine tidligere LinkedIn posts her..." />
+          <textarea
+            value={previousPosts}
+            onChange={(e) => setPreviousPosts(e.target.value)}
+            rows={3}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Paste 2-3 af dine tidligere LinkedIn posts her..."
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
@@ -168,7 +227,13 @@ function GhostwriterContent() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2">Målgruppe</label>
-              <input type="text" value={targetAudience} onChange={(e) => setTargetAudience(e.target.value)} className="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Eks: Startup founders" />
+              <input
+                type="text"
+                value={targetAudience}
+                onChange={(e) => setTargetAudience(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                placeholder="Eks: Startup founders"
+              />
             </div>
           </div>
 
@@ -190,11 +255,17 @@ function GhostwriterContent() {
             {posts.map((post, index) => (
               <div key={index} className="bg-white rounded-lg shadow p-4 md:p-6">
                 <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{post.angle || `Version ${index + 1}`}</span>
-                  {post.wordCount && <span className="text-gray-500 text-sm">{post.wordCount} ord</span>}
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                    {post.angle || `Version ${index + 1}`}
+                  </span>
+                  {post.wordCount && (
+                    <span className="text-gray-500 text-sm">{post.wordCount} ord</span>
+                  )}
                 </div>
                 <p className="text-base md:text-lg whitespace-pre-line mb-4">{post.content}</p>
-                <button onClick={() => copyToClipboard(post.content)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">📋 Kopier post</button>
+                <button onClick={() => copyToClipboard(post.content)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                  📋 Kopier post
+                </button>
               </div>
             ))}
           </div>
@@ -203,7 +274,9 @@ function GhostwriterContent() {
         {!fromHook && posts.length === 0 && (
           <div className="text-center mt-8 p-6 bg-gray-100 rounded-lg">
             <p className="text-gray-600 mb-3">Mangler du inspiration til en hook?</p>
-            <button onClick={() => router.push('/hooks')} className="px-6 py-2 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg text-sm">🪝 Gå til Hook Generator →</button>
+            <button onClick={() => router.push('/hooks')} className="px-6 py-2 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg text-sm">
+              🪝 Gå til Hook Generator →
+            </button>
           </div>
         )}
       </div>
