@@ -57,7 +57,10 @@ export default function CommentsPage() {
   };
 
   const generateComments = async () => {
-    if (!postText.trim()) { alert('Paste venligst LinkedIn-posten!'); return; }
+    if (!postText.trim()) {
+      alert('Paste venligst LinkedIn-posten!');
+      return;
+    }
     setLoading(true);
     setStatus('💬 Skriver kommentarer...');
     setComments([]);
@@ -68,13 +71,25 @@ export default function CommentsPage() {
         body: JSON.stringify({ userId, language, tone, relationship, postText }),
       });
       const data = await response.json();
-      if (response.ok) { setStatus(''); setComments(data.comments); }
-      else { setStatus(''); alert(data.error || 'Noget gik galt'); }
-    } catch (error) { setStatus(''); alert('Fejl ved generering'); }
-    finally { setLoading(false); }
+      if (response.ok) {
+        setStatus('');
+        setComments(data.comments);
+      } else {
+        setStatus('');
+        alert(data.error || 'Noget gik galt');
+      }
+    } catch (error) {
+      setStatus('');
+      alert('Fejl ved generering');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const copyToClipboard = (text: string) => { navigator.clipboard.writeText(text); alert('Kopieret!'); };
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    alert('Kopieret!');
+  };
 
   const getAngleLabel = (angle: string) => {
     if (angle === 'agree_add') return '✅ Enig + Tilføj';
@@ -113,7 +128,13 @@ export default function CommentsPage() {
 
         <div className="bg-white rounded-lg shadow p-4 md:p-6 mb-6">
           <label className="block text-sm font-medium mb-2">Paste LinkedIn-posten du vil kommentere på:</label>
-          <textarea value={postText} onChange={(e) => setPostText(e.target.value)} rows={6} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Copy-paste hele teksten fra LinkedIn-posten her..." />
+          <textarea
+            value={postText}
+            onChange={(e) => setPostText(e.target.value)}
+            rows={6}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Copy-paste hele teksten fra LinkedIn-posten her..."
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <div>
@@ -161,10 +182,14 @@ export default function CommentsPage() {
             <h2 className="text-xl md:text-2xl font-bold">🎯 Dine kommentarer:</h2>
             {comments.map((c, index) => (
               <div key={index} className="bg-white rounded-lg shadow p-4 md:p-6">
-                <span className="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded mb-3">{getAngleLabel(c.angle)}</span>
+                <span className="inline-block bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded mb-3">
+                  {getAngleLabel(c.angle)}
+                </span>
                 <p className="text-base md:text-lg mb-3">{c.text}</p>
                 <p className="text-sm text-gray-500 mb-4">💡 {c.reasoning}</p>
-                <button onClick={() => copyToClipboard(c.text)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">📋 Kopier kommentar</button>
+                <button onClick={() => copyToClipboard(c.text)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                  📋 Kopier kommentar
+                </button>
               </div>
             ))}
           </div>
