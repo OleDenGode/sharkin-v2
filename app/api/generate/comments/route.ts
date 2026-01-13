@@ -296,21 +296,21 @@ RETURN FORMAT PRÆCIS SÅLEDES:
       "angle": "agree_add",
       "strategy": "Lav risiko, stabil reward",
       "reasoning": "Hvorfor denne vinkel virker i denne kontekst",
-      "wordCount": 35
+      "wordCount": 50
     },
     {
       "text": "Kommentar-tekst her uden emojis eller special-tegn",
       "angle": "smart_question",
       "strategy": "Medium risiko, høj reward",
       "reasoning": "Hvorfor dette spørgsmål er relevant og værdifuldt",
-      "wordCount": 28
+      "wordCount": 50
     },
     {
       "text": "Kommentar-tekst her uden emojis eller special-tegn",
       "angle": "mini_case",
       "strategy": "Høj risiko, maksimal reward",
       "reasoning": "Hvorfor denne erfaring tilføjer værdi til samtalen",
-      "wordCount": 42
+      "wordCount": 50
     }
   ]
 }
