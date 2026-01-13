@@ -11,18 +11,19 @@ const supabase = createClient(
 interface Hook {
   id: string;
   text: string;
-  length: string;
-  strategy: string;
-  reason: string;
-  postType: string;
+  hookType: string;
+  toneMatch: string;
+  risk: string;
+  bestFor: string;
   outline: string[];
 }
 
 interface Analysis {
-  postType: string;
-  coreInsight: string;
-  intendedOutcome: string;
-  toneGuidance: string;
+  centralInsight: string;
+  emotionalDriver: string;
+  postArchetype: string;
+  senderLevel: string;
+  audienceMatch: string;
 }
 
 interface HookResult {
@@ -121,7 +122,7 @@ export default function HooksPage() {
     const outlineText = hook.outline.join('\n');
     localStorage.setItem('ghostwriter_hook', hook.text);
     localStorage.setItem('ghostwriter_outline', outlineText);
-    localStorage.setItem('ghostwriter_postType', hook.postType);
+    localStorage.setItem('ghostwriter_postType', hook.hookType);
     router.push('/ghostwriter?fromHook=true');
   };
 
@@ -211,61 +212,92 @@ export default function HooksPage() {
 
         {result && (
           <div>
+            {/* Analysis Section */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 md:p-6 mb-6 border border-blue-200">
-              <h2 className="text-lg font-bold mb-3">📊 Analyse af din kernidé</h2>
+              <h2 className="text-lg font-bold mb-4">📊 Analyse af din kernidé</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-600">Post-type:</p>
-                  <p className="font-medium">{result.analysis?.postType}</p>
+                  <p className="text-sm text-gray-600">Central indsigt:</p>
+                  <p className="font-medium">{result.analysis?.centralInsight}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Tone:</p>
-                  <p className="font-medium">{result.analysis?.toneGuidance}</p>
+                  <p className="text-sm text-gray-600">Emotionel driver:</p>
+                  <p className="font-medium">{result.analysis?.emotionalDriver}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Post-arketype:</p>
+                  <p className="font-medium">{result.analysis?.postArchetype}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Afsender-niveau:</p>
+                  <p className="font-medium">{result.analysis?.senderLevel}</p>
                 </div>
                 <div className="md:col-span-2">
-                  <p className="text-sm text-gray-600">Kerneindsigt:</p>
-                  <p className="font-medium">{result.analysis?.coreInsight}</p>
-                </div>
-                <div className="md:col-span-2">
-                  <p className="text-sm text-gray-600">Ønsket outcome:</p>
-                  <p className="font-medium">{result.analysis?.intendedOutcome}</p>
+                  <p className="text-sm text-gray-600">Målgruppe-match:</p>
+                  <p className="font-medium">{result.analysis?.audienceMatch}</p>
                 </div>
               </div>
             </div>
 
+            {/* Hooks Section */}
             <div className="space-y-4">
               <h2 className="text-xl md:text-2xl font-bold">🪝 Dine 5 hooks:</h2>
               {result.hooks?.map((hook, index) => (
                 <div key={hook.id || index} className="bg-white rounded-lg shadow overflow-hidden">
                   <div className="p-4 md:p-6">
+                    {/* Hook badges */}
                     <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">{hook.length}</span>
-                      <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded">{hook.postType}</span>
+                      <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                        {hook.hookType}
+                      </span>
+                      <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                        {hook.toneMatch}
+                      </span>
                     </div>
-                    <p className="text-lg md:text-xl font-medium whitespace-pre-line mb-3">{hook.text}</p>
-                    <p className="text-sm text-gray-600 mb-2">
-                      <span className="font-medium">Strategi:</span> {hook.strategy}
-                    </p>
-                    <p className="text-sm text-gray-500 mb-4">
-                      <span className="font-medium">Hvorfor det virker:</span> {hook.reason}
-                    </p>
+                    
+                    {/* Hook text */}
+                    <p className="text-lg md:text-xl font-medium whitespace-pre-line mb-4">{hook.text}</p>
+                    
+                    {/* Meta info */}
+                    <div className="bg-gray-50 rounded-lg p-3 mb-4 space-y-2">
+                      <p className="text-sm">
+                        <span className="font-medium text-gray-700">⚠️ Risiko:</span>{' '}
+                        <span className="text-gray-600">{hook.risk}</span>
+                      </p>
+                      <p className="text-sm">
+                        <span className="font-medium text-gray-700">🎯 Bedst til:</span>{' '}
+                        <span className="text-gray-600">{hook.bestFor}</span>
+                      </p>
+                    </div>
+
+                    {/* Action buttons */}
                     <div className="flex flex-wrap gap-2">
-                      <button onClick={() => copyToClipboard(hook.text)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">📋 Kopier hook</button>
+                      <button onClick={() => copyToClipboard(hook.text)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
+                        📋 Kopier hook
+                      </button>
                       <button onClick={() => toggleExpand(hook.id)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm">
                         {expandedHook === hook.id ? '▲ Skjul outline' : '▼ Vis outline'}
                       </button>
-                      <button onClick={() => sendToGhostwriter(hook)} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">✍️ Send til Ghostwriter →</button>
+                      <button onClick={() => sendToGhostwriter(hook)} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
+                        ✍️ Send til Ghostwriter →
+                      </button>
                     </div>
                   </div>
+
+                  {/* Expanded outline */}
                   {expandedHook === hook.id && (
                     <div className="bg-gray-50 border-t border-gray-200 p-4 md:p-6">
                       <h4 className="font-medium mb-3">📝 Post-outline:</h4>
                       <ol className="space-y-2">
                         {hook.outline?.map((step, i) => (
-                          <li key={i} className="text-sm text-gray-700 pl-2 border-l-2 border-blue-300">{step}</li>
+                          <li key={i} className="text-sm text-gray-700 pl-3 border-l-2 border-blue-300 py-1">
+                            {step}
+                          </li>
                         ))}
                       </ol>
-                      <button onClick={() => copyToClipboard(hook.outline?.join('\n') || '')} className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm">📋 Kopier outline</button>
+                      <button onClick={() => copyToClipboard(hook.outline?.join('\n') || '')} className="mt-4 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm">
+                        📋 Kopier outline
+                      </button>
                     </div>
                   )}
                 </div>
