@@ -5,9 +5,9 @@
 SharkIN hjælper LinkedIn creators med at skabe engagerende content ved hjælp af AI.
 
 **Features:**
-- 🪝 **Hook & Intro Studio** - Generer hooks til dine posts
-- ✍️ **Ghostwriter Workspace** - Skriv posts i din stil (kommer snart)
-- 💬 **Comment Copilot** - Smarte kommentarer (kommer snart)
+- 🪝 **Hook & Intro Studio** - Generer hooks til dine posts.
+- ✍️ **Ghostwriter Workspace** - Skriv posts i din stil.
+- 💬 **Comment Copilot** - Smarte kommentarer.
 
 ---
 
