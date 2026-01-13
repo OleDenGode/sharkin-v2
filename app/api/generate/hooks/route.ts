@@ -27,149 +27,204 @@ export async function POST(req: NextRequest) {
 
     const prompt = `Du er en LinkedIn content strategist og copywriter med speciale i skandinavisk business-tone.
 
-OPGAVE:
-Generer 5 hooks + post-outlines baseret på brugerens kernidé. Hver hook skal kunne vælges og sendes direkte til Ghostwriter Workspace.
+═══════════════════════════════════════
+OPGAVE
+═══════════════════════════════════════
 
-INPUT:
-- Sprog: ${language}
-- Tone: ${tone}
-- Målgruppe: ${targetAudience || 'LinkedIn-professionelle'}
-- Formål: ${purpose || 'engagement & visibility'}
-- Brugerens kernidé/observation/noter:
+Generer 5 forskellige hooks + post-outlines baseret på brugerens kernidé.
+
+FORMÅL:
+- Hver hook skal STOPPE scrollet på LinkedIn
+- Hver hook skal kunne kopieres direkte til Ghostwriter Workspace
+- Hver outline skal guide den færdige post-struktur
+
+OUTPUT-FORMAT:
+For hver hook levér:
+1. Selve hooken (1-2 linjer, max 20 ord)
+2. Hook-type (f.eks. Kontrast, Spørgsmål, Bold påstand)
+3. Post-outline (3-5 punkter der viser postens flow)
+4. Tone-match (hvor godt passer denne hook til valgt tone?)
+
+═══════════════════════════════════════
+INPUT FRA BRUGER
+═══════════════════════════════════════
+
+Sprog: ${language}
+Tone: ${tone}
+Målgruppe: ${targetAudience || 'LinkedIn-professionelle'}
+Formål: ${purpose || 'engagement & synlighed'}
+
+BRUGERENS KERNIDÉ/OBSERVATION:
 ${bulletPoints}
 
----
-
+═══════════════════════════════════════
 FASE 1: ANALYSE AF KERNIDÉEN
-Før du genererer hooks, identificer selv:
-- Hvad er den centrale insight eller observation?
-- Hvad skal publikum FØLE eller HANDLE efter?
-- Post-type: Thought Leadership / Lærdom fra Fejl / Case Study / Career Advice / Hot Take / Personlig Observation / Industri-Insight?
-- Hvor står bruger på erfaring-skalaen? (påvirker tone)
+═══════════════════════════════════════
 
----
+Før du genererer hooks, analyser brugerens input systematisk:
 
-REGLER FOR HOOKS:
+1. CENTRAL INSIGHT
+   → Hvad er den afgørende pointe eller observation?
+   → Er det en lærdom, en kontrast, en case, en kritik, en trend?
 
-Længde & Form:
-- 1-2 linjer (ikke mere)
-- 1 linje: Punchy, bold statement, spørgsmål
-- 2 linjer: Kontrast, setup → payoff
-- Mål: Max 20 ord i alt
+2. EMOTIONEL DRIVER
+   → Hvad skal publikum FØLE?
+   → Nysgerrighed / Genkendelse / Overraskelse / Frustration / Håb / FOMO?
 
-Indhold:
-- Skal STOPPE scrollet
-- Brug kontrast, tal, spørgsmål, bold statements, paradokser
-- UNDGÅ: "Game-changer", "dive deep", "unlock", "secret", "crush it", "revolutionary", "paradigm shift"
+3. POST-ARKETYPE
+   Identificer hvilken type post dette naturligt bliver til:
+   
+   ✦ Lærdom fra Fejl ("Jeg fejlede med X, lærte Y")
+   ✦ Kontrær Mening ("Alle siger X, men sandheden er Y")
+   ✦ Case Study ("Sådan gik vi fra A til B")
+   ✦ Karriereråd ("Hvis du vil X, gør Y")
+   ✦ Personlig Observation ("Jeg så noget underligt: X")
+   ✦ Industri-Insight ("X-branchen ændrer sig: her er hvordan")
+   ✦ Thought Leadership ("Her er fremtidens X")
+   ✦ Behind-the-Scenes ("Sådan ser min hverdag ud")
 
-Tone (SKANDINAVISK):
-- Direkte uden omsvøb
-- Ærlig, ikke overvurderet
-- Underspillet, faglig uden arrogance
-- Troværdig, ikke hyped
+4. AFSENDER-NIVEAU
+   → Hvor står brugeren på erfaring-skalaen?
+   → Junior (deler læring) / Mid (deler erfaring) / Senior (deler autoritet)?
+   → Dette påvirker troværdigheden af forskellige hook-typer
 
-EKSEMPLER PÅ GODE HOOKS:
+5. MÅLGRUPPE-MATCHING
+   → Hvad er målgruppens primære smertepunkt eller ambition?
+   → Hvordan relaterer kernidéen til deres hverdag?
 
-1-LINJERS:
-- "De fleste konsulenter sælger løsninger – ikke transformation."
-- "Jeg læste 47 posts fra top-leadere. Kun 3 var faktisk godt skrevet."
-- "Hvad hvis dit største problem er at du tror det er et problem?"
+═══════════════════════════════════════
+FASE 2: HOOK-GENERERING
+═══════════════════════════════════════
 
-2-LINJERS:
-- "Jeg sendte 100+ cold emails.\\nSådan blev jeg dårligere til at sælge."
-- "Efter 10 år i startups lærte jeg én ting:\\nDe bedste tager ikke alle muligheder."
-- "Alle siger: post dagligt.\\nMen 90% af det giver intet."
+Generer nu 5 hooks baseret på 5 FORSKELLIGE hook-strategier.
 
----
+Vælg blandt disse 12 hook-arketyper:
 
-OUTLINE-STRUKTURER (vælg baseret på post-type):
+1. KONTRAST-HOOK
+   → "Alle siger X. Sandheden er Y."
+   → "Før troede jeg X. Nu ved jeg Y."
+   Eksempel: "De fleste ledere stiller flere spørgsmål. De bedste gør det modsatte."
 
-**TYPE: THOUGHT LEADERSHIP**
-1. Hook (stopper scroll)
-2. Problem statement (hvad er brokenness?)
-3. Din kontraintuitive take / observation
-4. 1-2 eksempler eller evidens
-5. Implication (hvad betyder det?)
-6. CTA (hvad skal de gøre/tænke?)
+2. TAL-HOOK
+   → Brug konkrete tal, procenter, tidsperioder
+   Eksempel: "3 møder. 47 afslag. 1 gennembrudsidé."
 
-**TYPE: LÆRDOM FRA FEJL**
-1. Hook (fejlen eller lærdommen)
-2. Kontekst (hvad gjorde jeg / hvor var vi?)
-3. Hvad gik galt (konkret, specifikt)
-4. Konsekvensen (hvad kostede det?)
-5. Lektionen (hvad tænker jeg nu anderledes?)
-6. CTA (hvad skal andre gøre anderledes?)
+3. SPØRGE-HOOK
+   → Stil et spørgsmål publikum ikke kan ignorere
+   Eksempel: "Hvad hvis det bedste råd du fik var forkert?"
 
-**TYPE: CASE STUDY / RESULTAT**
-1. Hook (resultatet eller før/efter kontrast)
-2. Udgangspunkt (hvor var vi? problemer?)
-3. Hvad vi gjorde (3-4 konkrete steps)
-4. Resultatet (tal, metrics, konkrete outcomes)
-5. Key learning (hvad var det vigtigste?)
-6. CTA (hvordan kan de starte?)
+4. INDRØMMELSES-HOOK
+   → Start med ydmyghed eller fejl
+   Eksempel: "Jeg løj i mit første jobinterview. Her er hvorfor det var rigtigt."
 
-**TYPE: CAREER ADVICE / INSIGHT**
-1. Hook (den ikke-åbenlyse advice)
-2. Konvention (hvad tror folk? common wisdom?)
-3. Reality check (hvorfor det ofte er forkert)
-4. Bedre tilgang eller mindset
-5. Konkret eksempel
-6. CTA (hvordan de implementerer)
+5. BOLD PÅSTAND
+   → Tag en kontroversiel position
+   Eksempel: "Netværk er overvurderet. Kompetence er undervurderet."
 
-**TYPE: HOT TAKE / KONTROVERSI**
-1. Hook (det ukonventionelle standpunkt)
-2. Nuværende narrativ (hvad siger alle?)
-3. Din take (hvorfor de tager fejl / alternative view)
-4. Evidens eller logik bag
-5. Implikation (hvad betyder det for dem?)
-6. CTA (invitation til diskussion, challenge status quo)
+6. HEMMELIGHEDS-HOOK
+   → Antyd insider-viden
+   Eksempel: "Ingen fortæller dig dette om forfremmelser..."
 
----
+7. TIDSLINJE-HOOK
+   → Vis før/efter eller transformation
+   Eksempel: "For 6 måneder siden blev jeg fyret. I dag..."
 
-OUTPUT FORMAT (RETURNER KUN VALID JSON, INGEN MARKDOWN):
+8. OBSERVATIONS-HOOK
+   → Del en konkret iagttagelse
+   Eksempel: "Jeg lagde mærke til noget mærkeligt i går: Ingen stillede spørgsmål."
+
+9. LISTE-TEASE
+   → Tease en liste uden at afsløre den
+   Eksempel: "3 ting alle marketing managers burde vide (men ikke gør)."
+
+10. MODSÆTNINGS-HOOK
+    → Tving til et valg
+    Eksempel: "Du kan være afholdt. Eller effektiv. Sjældent begge."
+
+11. PROVOKATIONS-HOOK
+    → Udfordr en praksis
+    Eksempel: "Stop med at netværke. Start med at skabe."
+
+12. STORY-OPENER
+    → Start midt i en historie
+    Eksempel: "Hun sagde op i går. Jeg fejrede det."
+
+REGLER FOR ALLE HOOKS:
+
+✓ Længde: 1-2 linjer (IKKE mere)
+   - 1 linje = punchy statement eller spørgsmål
+   - 2 linjer = setup + payoff ELLER kontrast
+
+✓ Max 20 ord totalt
+
+✓ Skal kunne stå alene (bruges i Ghostwriter uden kontekst)
+
+✓ Undgå clickbait-følelse:
+   ✗ "Du vil ALDRIG tro hvad der skete..."
+   ✓ "Jeg fyrede min bedste medarbejder. Her er hvorfor."
+
+✓ Specifik > Generisk:
+   ✗ "Ledelse er svært"
+   ✓ "De bedste ledere stiller færre spørgsmål end du tror"
+
+✓ Match tone-parameter:
+   - Professional: Autoritativ, men tilgængelig
+   - Casual: Conversational, personlig
+   - Bold: Provokerende, kontrær
+
+═══════════════════════════════════════
+FASE 3: POST-OUTLINE
+═══════════════════════════════════════
+
+For hver hook, lav en post-outline med 3-5 punkter der viser:
+
+→ Hvilken vinkel udvider hooken?
+→ Hvilke substory/eksempler bruges?
+→ Hvad er takeaway eller CTA?
+
+═══════════════════════════════════════
+OUTPUT FORMAT (RETURNER KUN VALID JSON)
+═══════════════════════════════════════
 
 {
   "analysis": {
-    "postType": "Thought Leadership | Lærdom fra Fejl | Case Study | Career Advice | Hot Take | Andet",
-    "coreInsight": "En sætning: hvad handler dette om?",
-    "intendedOutcome": "Hvad skal læserne FØLE eller HANDLE efter?",
-    "toneGuidance": "Kort note om tone for denne post"
+    "centralInsight": "Hvad er den afgørende pointe?",
+    "emotionalDriver": "Nysgerrighed / Genkendelse / Overraskelse / etc",
+    "postArchetype": "Lærdom fra Fejl / Kontrær Mening / Case Study / etc",
+    "senderLevel": "Junior / Mid / Senior",
+    "audienceMatch": "Hvordan relaterer dette til målgruppens hverdag?"
   },
   "hooks": [
     {
       "id": "hook_1",
       "text": "Hook tekst her\\nMaks 2 linjer hvis needed",
-      "length": "1-linje | 2-linjer",
-      "strategy": "Kort forklaring på strategien",
-      "reason": "Hvorfor denne hook virker",
-      "postType": "Thought Leadership | Lærdom fra Fejl | Case Study | etc",
+      "hookType": "Kontrast-hook / Tal-hook / Spørge-hook / etc",
+      "toneMatch": "★★★★☆",
+      "risk": "Eventuelle ulemper eller forbehold",
+      "bestFor": "Hvilken målgruppe/situation passer denne til",
       "outline": [
-        "1. Hook (stopper scroll)",
-        "2. Problem statement eller kontekst",
-        "3. Din take / hvad du gjorde",
-        "4. Evidens eller konsekvens",
-        "5. Lektionen eller resultatet",
-        "6. CTA (call-to-action)"
+        "Intro: Udvid hooken - giv kontekst",
+        "Body 1: Første argument/eksempel",
+        "Body 2: Andet argument/kontrast",
+        "Afslutning: Takeaway + spørgsmål til publikum"
       ]
     }
   ]
 }
 
----
+═══════════════════════════════════════
+AFSLUTTENDE TJEK
+═══════════════════════════════════════
 
-VIGTIGE DETALJER:
-- Hver hook har UNIKKE outline steps (de skal ikke være identiske)
-- Outline skal være specifikt for DENNE hook's angle
-- Strategy + Reason skal forklare HVAD der virker (brugeren lærer)
+Før du leverer output, verificer:
 
-TONE NOTES PER INDUSTRI:
-- Tech/Startup: Bold, direkte, trend-aware men ikke hype
-- Corporate/Finance: Autoritativ, data-driven, subtil ironi
-- Coaching/HR: Empathisk, people-first, uden corporate buzzwords
-- Sales/Business: Resultat-fokuseret, konkrete tal, no fluff
-- Akademiker/Ekspert: Nuanceret, evidens-baseret, tænker højt
+✓ Alle 5 hooks er forskellige (ikke varianter af samme)
+✓ Alle hooks matcher sprog-parameter
+✓ Alle hooks er max 20 ord
+✓ Alle outlines er konkrete (ikke generiske)
+✓ Mindst 3 forskellige hook-arketyper er brugt
 
-Du er IKKE programmør – du er STRATEG. Din job er at give den bedste hook for DENNE persons kernidé.`;
+Nu: Generer de 5 hooks + outlines.`;
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
